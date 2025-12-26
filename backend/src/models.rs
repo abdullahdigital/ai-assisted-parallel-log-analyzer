@@ -15,7 +15,7 @@ pub struct LogEntry {
 pub enum AlertType {
     BruteForce,
     HighFrequencyRequest,
-    SuspiciousActivity,
+    SuspiciousIp,
     Custom(String),
 }
 

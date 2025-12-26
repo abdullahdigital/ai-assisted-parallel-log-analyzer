@@ -17,10 +17,30 @@ pub fn explain_log_entry(log_entry: &LogEntry) -> AiExplanation {
         explanation.push_str("This log entry indicates an error or a failure event. It's critical and requires immediate attention.");
         if details.contains("authentication") {
             explanation.push_str(" Specifically, it seems to be an authentication failure, possibly due to incorrect credentials or an unauthorized access attempt.");
-            suggested_rules.push(Rule { id: "auth_fail_rule".to_string(), pattern: "authentication failed".to_string(), description: "Alert on repeated authentication failures.".to_string() });
+            suggested_rules.push(Rule { 
+                id: "auth_fail_rule".to_string(), 
+                name: "Authentication Failure".to_string(),
+                pattern: "authentication failed".to_string(), 
+                description: "Alert on repeated authentication failures.".to_string(),
+                rule_type: crate::models::RuleType::BruteForce,
+                time_window_seconds: Some(300),
+                threshold: Some(5),
+                alert_type: crate::models::AlertType::BruteForce,
+                enabled: true,
+            });
         } else if details.contains("connection refused") {
             explanation.push_str(" The error suggests a connection issue, where a client was unable to establish a connection to a service.");
-            suggested_rules.push(Rule { id: "conn_refused_rule".to_string(), pattern: "connection refused".to_string(), description: "Alert on connection refused errors.".to_string() });
+            suggested_rules.push(Rule { 
+                id: "conn_refused_rule".to_string(), 
+                name: "Connection Refused".to_string(),
+                pattern: "connection refused".to_string(), 
+                description: "Alert on connection refused errors.".to_string(),
+                rule_type: crate::models::RuleType::Custom("connection_error".to_string()),
+                time_window_seconds: None,
+                threshold: None,
+                alert_type: crate::models::AlertType::Custom("ConnectionError".to_string()),
+                enabled: true,
+            });
         }
     } else if details.contains("WARN") || details.contains("warning") {
         explanation.push_str("This log entry indicates a warning. While not critical, it suggests a potential issue that might lead to problems if not addressed.");
@@ -31,7 +51,17 @@ pub fn explain_log_entry(log_entry: &LogEntry) -> AiExplanation {
         }
     } else if details.contains("denied") || details.contains("unauthorized") {
         explanation.push_str("This log entry indicates an access control issue, where an operation was denied due to insufficient permissions or unauthorized access.");
-        suggested_rules.push(Rule { id: "access_denied_rule".to_string(), pattern: "access denied|unauthorized".to_string(), description: "Alert on access denied or unauthorized attempts.".to_string() });
+        suggested_rules.push(Rule { 
+            id: "access_denied_rule".to_string(), 
+            name: "Access Denied/Unauthorized".to_string(),
+            pattern: "access denied|unauthorized".to_string(), 
+            description: "Alert on access denied or unauthorized attempts.".to_string(),
+            rule_type: crate::models::RuleType::Custom("access_control".to_string()),
+            time_window_seconds: None,
+            threshold: None,
+            alert_type: crate::models::AlertType::Custom("AccessControl".to_string()),
+            enabled: true,
+        });
     }
 
     if explanation.is_empty() {
@@ -53,8 +83,14 @@ pub fn generate_rule_from_description(description: &str) -> Option<Rule> {
             if !pattern_str.is_empty() {
                 return Some(Rule {
                     id: format!("generated_rule_{}", uuid::Uuid::new_v4()),
+                    name: format!("Generated Rule: {}", pattern_str),
                     pattern: pattern_str,
                     description: description.to_string(),
+                    rule_type: crate::models::RuleType::Custom("generated".to_string()),
+                    time_window_seconds: None,
+                    threshold: None,
+                    alert_type: crate::models::AlertType::Custom("GeneratedAlert".to_string()),
+                    enabled: true,
                 });
             }
         }

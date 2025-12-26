@@ -1,4 +1,4 @@
-use crate::models::{LogEntry, Rule, Alert, AlertType};
+use crate::models::{LogEntry, Rule, Alert};
 use regex::Regex;
 use serde::{Serialize, Deserialize};
 use chrono::Utc;

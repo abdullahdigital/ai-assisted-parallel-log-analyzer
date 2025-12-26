@@ -1,13 +1,15 @@
-use tokio::net::TcpStream;
+use tokio::net::TcpListener;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use serde::{Serialize, Deserialize};
+
 use crate::models::{Metrics, Alert, WorkerMessage, MasterMessage};
-use std::sync::{Arc, Mutex};
+
+use crate::threat_detection::ThreatDetector;
+
 use std::error::Error;
 
 pub async fn run_worker(worker_id: usize) -> Result<(), Box<dyn Error>> {
     let addr = format!("127.0.0.1:{}", 8081 + worker_id as u16);
-    let listener = TcpListener::bind(&addr).await?;
+    let listener: TcpListener = TcpListener::bind(&addr).await?;
     println!("Worker {} listening on {}", worker_id, addr);
 
     let mut threat_detector: Option<ThreatDetector> = None;
@@ -15,7 +17,7 @@ pub async fn run_worker(worker_id: usize) -> Result<(), Box<dyn Error>> {
     let mut generated_alerts: Vec<Alert> = Vec::new();
 
     loop {
-        let (mut socket, _) = listener.accept().await?;
+        let (mut socket, _): (tokio::net::TcpStream, std::net::SocketAddr) = listener.accept().await?;
         println!("Worker {} accepted connection from master", worker_id);
 
         let mut len_bytes = [0u8; 4];

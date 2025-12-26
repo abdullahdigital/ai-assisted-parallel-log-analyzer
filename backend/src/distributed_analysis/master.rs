@@ -43,6 +43,9 @@ pub async fn run_master(log_lines: Vec<String>, rules: Vec<Rule>, num_workers: u
         let handle = tokio::spawn(async move {
             let log_entries_chunk: Vec<LogEntry> = chunk.into_iter().map(|line| LogEntry {
                 timestamp: Utc::now(), // Assign current UTC timestamp
+                ip_address: None,
+                user_id: None,
+                event_type: "unknown".to_string(),
                 details: line,
             }).collect();
             let log_chunk_message = WorkerMessage::LogChunk(log_entries_chunk);
@@ -70,7 +73,7 @@ pub async fn run_master(log_lines: Vec<String>, rules: Vec<Rule>, num_workers: u
 
     let mut worker_streams_for_shutdown = Vec::new();
     for handle in handles {
-        worker_streams_for_shutdown.push(handle.await??);
+        worker_streams_for_shutdown.push(handle.await?.map_err(|e| Box::<dyn std::error::Error + Send + Sync>::from(e))?);
     }
 
     // Now send shutdown messages and collect final results

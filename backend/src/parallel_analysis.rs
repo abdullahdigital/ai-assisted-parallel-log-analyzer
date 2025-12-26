@@ -23,6 +23,8 @@ pub fn run_parallel_analysis(parsed_logs: Vec<LogEntry>, rules: Vec<Rule>) -> Me
 
     Metrics {
         total_logs_processed: *processed_logs_count.lock().unwrap(),
+        execution_time_ms: 0,
+        logs_per_second: 0.0,
         alerts_generated: alerts.lock().unwrap().clone(),
         mode: "Parallel".to_string(),
     }

@@ -15,10 +15,10 @@ mod rules_engine;
 mod log_processor;
 mod ai_module;
 
-use models::{LogEntry, Rule, Metrics};
+use models::{LogEntry, Metrics};
 use log_parser::parse_log_entry;
-use sequential_analysis::run_sequential_analysis;
-use parallel_analysis::run_parallel_analysis;
+
+
 
 use utils::Timer;
 use rules_engine::RulesEngine;
@@ -83,7 +83,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 "sequential" => {
                     println!("Running sequential analysis...");
                     let parsed_logs: Vec<LogEntry> = log_lines.iter()
-                        .filter_map(|line| parse_log_entry(line).ok())
+                        .filter_map(|line| parse_log_entry(line))
                         .collect();
                     metrics = process_sequential(parsed_logs, Arc::new(Mutex::new(rules_engine)));
                     let elapsed_time_ms = timer.elapsed_millis();
@@ -93,7 +93,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 "parallel" => {
                     println!("Running parallel analysis...");
                     let parsed_logs: Vec<LogEntry> = log_lines.iter()
-                        .filter_map(|line| parse_log_entry(line).ok())
+                        .filter_map(|line| parse_log_entry(line))
                         .collect();
                     metrics = process_parallel(parsed_logs, Arc::new(Mutex::new(rules_engine)));
                     let elapsed_time_ms = timer.elapsed_millis();
@@ -102,7 +102,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 },
                 "distributed" => {
                     println!("Running distributed analysis with {} workers...", args.workers);
-                    metrics = process_distributed(log_lines, Arc::new(Mutex::new(rules_engine)));
+                    let parsed_logs: Vec<LogEntry> = log_lines.iter()
+                        .filter_map(|line| parse_log_entry(line))
+                        .collect();
+                    metrics = process_distributed(parsed_logs, Arc::new(Mutex::new(rules_engine)));
                     let elapsed_time_ms = timer.elapsed_millis();
                     // metrics.execution_time_ms = elapsed_time_ms;
                     // metrics.logs_per_second = (metrics.total_logs_processed as f64 / elapsed_time_ms as f64) * 1000.0;

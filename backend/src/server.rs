@@ -1,12 +1,12 @@
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 use actix_web::web::Bytes;
-use serde::{Deserialize, Serialize};
+
 use std::sync::{Arc, Mutex};
 
-use crate::models::{LogEntry, Rule, Metrics};
+use crate::models::{LogEntry, Rule};
 use crate::rules_engine::RulesEngine;
 use crate::log_processor::{process_sequential, process_parallel, process_distributed, parse_log_content};
-use crate::ai_module::{explain_log_entry, generate_rule_from_description, AiExplanation};
+use crate::ai_module::{explain_log_entry, generate_rule_from_description};
 
 pub struct AppState {
     pub rules_engine: Arc<Mutex<RulesEngine>>,

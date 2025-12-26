@@ -24,21 +24,26 @@ impl ThreatDetector {
     }
 
     pub fn detect_threats(&mut self, log_entry: &LogEntry) -> Option<Alert> {
-        for rule in &self.rules {
+        let mut generated_alerts: Vec<Alert> = Vec::new();
+
+        // Clone rules to iterate over them, allowing mutable access to self within the loop
+        let rules_clone = self.rules.clone();
+
+        for rule in rules_clone {
             match rule.rule_type {
                 RuleType::BruteForce => {
-                    if let Some(alert) = self.check_brute_force(log_entry, rule) {
-                        return Some(alert);
+                    if let Some(alert) = self.check_brute_force(log_entry, &rule) {
+                        generated_alerts.push(alert);
                     }
                 }
                 RuleType::HighFrequencyRequest => {
-                    if let Some(alert) = self.check_high_frequency_request(log_entry, rule) {
-                        return Some(alert);
+                    if let Some(alert) = self.check_high_frequency_request(log_entry, &rule) {
+                        generated_alerts.push(alert);
                     }
                 }
                 RuleType::SuspiciousIp => {
-                    if let Some(alert) = self.check_suspicious_ip_behavior(log_entry, rule) {
-                        return Some(alert);
+                    if let Some(alert) = self.check_suspicious_ip_behavior(log_entry, &rule) {
+                        generated_alerts.push(alert);
                     }
                 }
                 RuleType::Custom(_) => {
@@ -46,7 +51,7 @@ impl ThreatDetector {
                 }
             }
         }
-        None
+        generated_alerts.into_iter().next()
     }
 
     fn check_brute_force(&mut self, log_entry: &LogEntry, rule: &Rule) -> Option<Alert> {

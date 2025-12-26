@@ -1,6 +1,5 @@
 use crate::models::LogEntry;
 use chrono::{DateTime, Utc};
-use std::collections::HashMap;
 
 pub fn parse_log_entry(line: &str) -> Option<LogEntry> {
     // Example log format: [2023-10-27T10:00:00Z] INFO 192.168.1.1 user_id=testuser event=login_failed details={"reason":"bad_password"}
@@ -32,7 +31,7 @@ pub fn parse_log_entry(line: &str) -> Option<LogEntry> {
 
     Some(LogEntry {
         timestamp,
-        ip_address,
+        ip_address: Some(ip_address),
         user_id,
         event_type: event_type.unwrap_or_else(|| "unknown".to_string()),
         details: details_str.unwrap_or_else(|| "{}".to_string()),
