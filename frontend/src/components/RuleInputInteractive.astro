@@ -1,0 +1,484 @@
+---
+// Astro component script for RuleInputInteractive.astro
+interface Rule {
+    name: string;
+    description: string;
+    rule_type: string;
+    threshold: number;
+    time_window_seconds: number;
+}
+
+interface Props {
+    rules: Rule[];
+}
+
+const { rules = [] } = Astro.props;
+---
+
+<link rel="stylesheet" href="/src/components/RuleInputInteractive.css">
+
+<div class="rule-input-container">
+    <div class="rule-tabs">
+        <button class="rule-tab active" data-tab="manual">Manual Rule</button>
+        <button class="rule-tab" data-tab="ai">AI Assistant</button>
+        <button class="rule-tab" data-tab="templates">Templates</button>
+    </div>
+    
+    <div class="tab-content active" id="manual-tab">
+        <div class="rule-form">
+            <div class="form-group">
+                <label for="rule-name">Rule Name</label>
+                <input type="text" id="rule-name" placeholder="e.g., Brute Force Detection" />
+            </div>
+            
+            <div class="form-group">
+                <label for="rule-description">Description</label>
+                <textarea id="rule-description" placeholder="Describe what this rule detects..." rows="3"></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="rule-type">Rule Type</label>
+                    <select id="rule-type">
+                        <option value="brute-force">Brute Force</option>
+                        <option value="ddos">DDoS Attack</option>
+                        <option value="malware">Malware Detection</option>
+                        <option value="data-exfil">Data Exfiltration</option>
+                        <option value="custom">Custom Pattern</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="severity">Severity</label>
+                    <select id="severity">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="threshold">Threshold</label>
+                    <input type="number" id="threshold" min="1" max="1000" value="5" />
+                    <span class="helper">events within time window</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="time-window">Time Window</label>
+                    <div class="time-input">
+                        <input type="number" id="time-window" min="1" max="3600" value="60" />
+                        <select id="time-unit">
+                            <option value="seconds">Seconds</option>
+                            <option value="minutes">Minutes</option>
+                            <option value="hours">Hours</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-secondary" id="test-rule-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    Test Rule
+                </button>
+                <button class="btn-primary" id="save-rule-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg>
+                    Save Rule
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-content" id="ai-tab">
+        <div class="ai-assistant">
+            <div class="ai-header">
+                <div class="ai-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5a3 3 0 1 0-3 3"></path>
+                        <path d="M12 5a3 3 0 1 1 3 3"></path>
+                        <path d="M12 7a6 6 0 0 1 6 6v3a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2v-1a2 2 0 0 0-2-2 1 1 0 0 1-1-1V7a3 3 0 0 0-3-3H8a3 3 0 0 0-3 3v1a1 1 0 0 1-1 1 2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2v-3a6 6 0 0 1 6-6z"></path>
+                    </svg>
+                </div>
+                <h3>AI Rule Assistant</h3>
+            </div>
+            
+            <div class="ai-input">
+                <label for="ai-prompt">Describe the threat you want to detect:</label>
+                <textarea 
+                    id="ai-prompt" 
+                    placeholder="Example: 'Detect when a user fails to login more than 5 times within 5 minutes from the same IP address'"
+                    rows="4"
+                ></textarea>
+                
+                <button class="btn-primary" id="generate-rule-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Generate Rule
+                </button>
+            </div>
+            
+            <div class="ai-output" id="ai-output" style="display: none;">
+                <div class="ai-result">
+                    <h4>Generated Rule:</h4>
+                    <div class="rule-preview">
+                        <pre id="generated-rule-code"></pre>
+                    </div>
+                    
+                    <div class="ai-actions">
+                        <button class="btn-secondary" id="regenerate-btn">
+                            Regenerate
+                        </button>
+                        <button class="btn-primary" id="use-rule-btn">
+                            Use This Rule
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-content" id="templates-tab">
+        <div class="templates-grid">
+            <div class="template-card" data-template="brute-force">
+                <div class="template-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
+                <h4>Brute Force</h4>
+                <p>Detect multiple failed login attempts</p>
+                <button class="btn-small use-template-btn">Use Template</button>
+            </div>
+            
+            <div class="template-card" data-template="ddos">
+                <div class="template-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                </div>
+                <h4>DDoS Attack</h4>
+                <p>Detect high request volume</p>
+                <button class="btn-small use-template-btn">Use Template</button>
+            </div>
+            
+            <div class="template-card" data-template="data-exfil">
+                <div class="template-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </div>
+                <h4>Data Exfiltration</h4>
+                <p>Detect large data transfers</p>
+                <button class="btn-small use-template-btn">Use Template</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Tab switching
+        const tabs = document.querySelectorAll('.rule-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.dataset.tab;
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show corresponding content
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `${tabId}-tab`) {
+                        content.classList.add('active');
+                    }
+                });
+            });
+        });
+        
+        // Template selection
+        const templateCards = document.querySelectorAll('.use-template-btn');
+        templateCards.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const card = btn.closest('.template-card');
+                const template = card.dataset.template;
+                
+                // Switch to manual tab and populate form
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                document.querySelector('[data-tab="manual"]').classList.add('active');
+                document.getElementById('manual-tab').classList.add('active');
+                
+                // Populate form based on template
+                populateTemplate(template);
+            });
+        });
+        
+        // Test Rule button
+        const testRuleBtn = document.getElementById('test-rule-btn');
+        testRuleBtn.addEventListener('click', () => {
+            const ruleName = document.getElementById('rule-name').value;
+            if (!ruleName) {
+                alert('Please enter a rule name first');
+                return;
+            }
+            
+            testRuleBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                </svg>
+                Testing...
+            `;
+            testRuleBtn.disabled = true;
+            
+            setTimeout(() => {
+                testRuleBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    Test Rule
+                `;
+                testRuleBtn.disabled = false;
+                
+                alert(`Rule "${ruleName}" tested successfully! No conflicts found.`);
+            }, 1500);
+        });
+        
+        // Save Rule button
+        const saveRuleBtn = document.getElementById('save-rule-btn');
+        saveRuleBtn.addEventListener('click', () => {
+            const ruleName = document.getElementById('rule-name').value;
+            const description = document.getElementById('rule-description').value;
+            const ruleType = document.getElementById('rule-type').value;
+            const severity = document.getElementById('severity').value;
+            const threshold = document.getElementById('threshold').value;
+            const timeWindow = document.getElementById('time-window').value;
+            const timeUnit = document.getElementById('time-unit').value;
+            
+            if (!ruleName || !description) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            const rule = {
+                name: ruleName,
+                description: description,
+                type: ruleType,
+                severity: severity,
+                threshold: parseInt(threshold),
+                timeWindow: {
+                    value: parseInt(timeWindow),
+                    unit: timeUnit
+                },
+                createdAt: new Date().toISOString(),
+                status: 'active'
+            };
+            
+            saveRuleBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                Saving...
+            `;
+            saveRuleBtn.disabled = true;
+            
+            setTimeout(() => {
+                saveRuleBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg>
+                    Save Rule
+                `;
+                saveRuleBtn.disabled = false;
+                
+                // Clear form
+                document.getElementById('rule-name').value = '';
+                document.getElementById('rule-description').value = '';
+                
+                alert(`Rule "${rule.name}" saved successfully!`);
+                
+                // Dispatch event for parent component
+                const event = new CustomEvent('ruleAdded', {
+                    detail: rule,
+                    bubbles: true
+                });
+                document.dispatchEvent(event);
+            }, 1000);
+        });
+        
+        // AI Rule Generation
+        const generateRuleBtn = document.getElementById('generate-rule-btn');
+        const aiPrompt = document.getElementById('ai-prompt');
+        const aiOutput = document.getElementById('ai-output');
+        const generatedRuleCode = document.getElementById('generated-rule-code');
+        const regenerateBtn = document.getElementById('regenerate-btn');
+        const useRuleBtn = document.getElementById('use-rule-btn');
+        
+        generateRuleBtn.addEventListener('click', () => {
+            const prompt = aiPrompt.value.trim();
+            if (!prompt) {
+                alert('Please describe the threat you want to detect');
+                return;
+            }
+            
+            generateRuleBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                </svg>
+                Generating...
+            `;
+            generateRuleBtn.disabled = true;
+            
+            setTimeout(() => {
+                generateRuleBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Generate Rule
+                `;
+                generateRuleBtn.disabled = false;
+                
+                // Generate example rule based on prompt
+                const rule = generateAIRule(prompt);
+                generatedRuleCode.textContent = JSON.stringify(rule, null, 2);
+                aiOutput.style.display = 'block';
+            }, 2000);
+        });
+        
+        regenerateBtn.addEventListener('click', () => {
+            const prompt = aiPrompt.value.trim();
+            if (!prompt) return;
+            
+            const rule = generateAIRule(prompt, true);
+            generatedRuleCode.textContent = JSON.stringify(rule, null, 2);
+        });
+        
+        useRuleBtn.addEventListener('click', () => {
+            const rule = JSON.parse(generatedRuleCode.textContent);
+            
+            // Switch to manual tab and populate form
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            document.querySelector('[data-tab="manual"]').classList.add('active');
+            document.getElementById('manual-tab').classList.add('active');
+            
+            // Populate form with AI-generated rule
+            document.getElementById('rule-name').value = rule.name;
+            document.getElementById('rule-description').value = rule.description;
+            document.getElementById('rule-type').value = rule.type;
+            document.getElementById('severity').value = rule.severity;
+            document.getElementById('threshold').value = rule.threshold;
+            document.getElementById('time-window').value = rule.timeWindow.value;
+            document.getElementById('time-unit').value = rule.timeWindow.unit;
+            
+            aiOutput.style.display = 'none';
+            aiPrompt.value = '';
+        });
+        
+        // Helper functions
+        function populateTemplate(template) {
+            const templates = {
+                'brute-force': {
+                    name: 'Brute Force Detection',
+                    description: 'Detects multiple failed login attempts from the same IP address within a specified time window.',
+                    type: 'brute-force',
+                    severity: 'critical',
+                    threshold: 5,
+                    timeWindow: 300,
+                    timeUnit: 'seconds'
+                },
+                'ddos': {
+                    name: 'DDoS Attack Detection',
+                    description: 'Detects unusually high request volume indicating a potential DDoS attack.',
+                    type: 'ddos',
+                    severity: 'critical',
+                    threshold: 1000,
+                    timeWindow: 60,
+                    timeUnit: 'seconds'
+                },
+                'data-exfil': {
+                    name: 'Data Exfiltration Detection',
+                    description: 'Detects large data transfers to external IP addresses during non-business hours.',
+                    type: 'data-exfil',
+                    severity: 'high',
+                    threshold: 100,
+                    timeWindow: 3600,
+                    timeUnit: 'seconds'
+                }
+            };
+            
+            const t = templates[template];
+            if (!t) return;
+            
+            document.getElementById('rule-name').value = t.name;
+            document.getElementById('rule-description').value = t.description;
+            document.getElementById('rule-type').value = t.type;
+            document.getElementById('severity').value = t.severity;
+            document.getElementById('threshold').value = t.threshold;
+            document.getElementById('time-window').value = t.timeWindow;
+            document.getElementById('time-unit').value = t.timeUnit;
+        }
+        
+        function generateAIRule(prompt, regenerate = false) {
+            const examples = [
+                {
+                    name: 'Brute Force Protection',
+                    description: `Detects ${Math.floor(Math.random() * 10) + 3} failed login attempts from the same IP within ${Math.floor(Math.random() * 10) + 1} minutes.`,
+                    type: 'brute-force',
+                    severity: 'critical',
+                    threshold: Math.floor(Math.random() * 10) + 3,
+                    timeWindow: {
+                        value: Math.floor(Math.random() * 10) + 1,
+                        unit: 'minutes'
+                    }
+                },
+                {
+                    name: 'Suspicious File Access',
+                    description: `Detects unauthorized access to sensitive files more than ${Math.floor(Math.random() * 5) + 2} times within an hour.`,
+                    type: 'custom',
+                    severity: 'high',
+                    threshold: Math.floor(Math.random() * 5) + 2,
+                    timeWindow: {
+                        value: 1,
+                        unit: 'hours'
+                    }
+                },
+                {
+                    name: 'Port Scanning Detection',
+                    description: `Detects scanning of ${Math.floor(Math.random() * 20) + 10} different ports from the same source within a minute.`,
+                    type: 'malware',
+                    severity: 'medium',
+                    threshold: Math.floor(Math.random() * 20) + 10,
+                    timeWindow: {
+                        value: 1,
+                        unit: 'minutes'
+                    }
+                }
+            ];
+            
+            return regenerate ? examples[Math.floor(Math.random() * examples.length)] : examples[0];
+        }
+    });
+</script>

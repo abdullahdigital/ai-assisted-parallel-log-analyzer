@@ -1,0 +1,29 @@
+use crate::models::{LogEntry, Alert, Metrics, Rule};
+use crate::log_parser::parse_log_entry;
+use crate::threat_detection::ThreatDetector;
+use std::time::Instant;
+use rayon::prelude::*;
+use std::sync::{Arc, Mutex};
+
+pub fn run_parallel_analysis(parsed_logs: Vec<LogEntry>, rules: Vec<Rule>) -> Metrics {
+    let alerts: Arc<Mutex<Vec<Alert>>> = Arc::new(Mutex::new(Vec::new()));
+    let processed_logs_count: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
+    let threat_detector = Arc::new(Mutex::new(ThreatDetector::new(rules)));
+
+    parsed_logs.par_iter().for_each(|log_entry| {
+        let mut detector_lock = threat_detector.lock().unwrap();
+        let mut alerts_lock = alerts.lock().unwrap();
+        let mut count_lock = processed_logs_count.lock().unwrap();
+
+        *count_lock += 1;
+        if let Some(alert) = detector_lock.detect_threats(log_entry) {
+            alerts_lock.push(alert);
+        }
+    });
+
+    Metrics {
+        total_logs_processed: *processed_logs_count.lock().unwrap(),
+        alerts_generated: alerts.lock().unwrap().clone(),
+        mode: "Parallel".to_string(),
+    }
+}

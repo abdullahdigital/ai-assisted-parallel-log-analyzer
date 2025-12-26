@@ -1,0 +1,144 @@
+---
+// Astro component script for LogAnalysisInteractive.astro
+interface Metrics {
+    total_logs_processed: number;
+    execution_time_ms: number;
+    logs_per_second: number;
+    alerts_generated: Alert[];
+    mode: string;
+}
+
+interface Alert {
+    id: string;
+    timestamp: string;
+    alert_type: string;
+    description: string;
+    log_entry_sample: any;
+}
+
+interface LogAnalysisInteractiveProps {
+    initialMetrics: Metrics[];
+}
+
+const { initialMetrics = [] } = Astro.props;
+---
+
+<div class="log-analysis-container">
+    <div class="chart-container">
+        <canvas id="performanceChart"></canvas>
+    </div>
+    
+    <div class="metrics-summary">
+        <div class="summary-card">
+            <div class="summary-icon" style="background: linear-gradient(135deg, #007bff, #8a2be2);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.66 0 3-4 3-9s-1.34-9-3-9m0 18c-1.66 0-3-4-3-9s1.34-9 3-9"></path>
+                </svg>
+            </div>
+            <div class="summary-content">
+                <div class="summary-value">22</div>
+                <div class="summary-label">Total Alerts</div>
+            </div>
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-icon" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <div class="summary-content">
+                <div class="summary-value">13,505</div>
+                <div class="summary-label">Max Logs/Sec</div>
+            </div>
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-icon" style="background: linear-gradient(135deg, #dc3545, #fd7e14);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                </svg>
+            </div>
+            <div class="summary-content">
+                <div class="summary-value">99.8%</div>
+                <div class="summary-label">Accuracy Rate</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="/src/components/LogAnalysisInteractive.css">
+
+<script>
+    import Chart from 'chart.js/auto';
+    
+    let chartInstance = null;
+    
+    const createChart = () => {
+        const ctx = document.getElementById('performanceChart');
+        if (!ctx) return;
+        
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+        
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                datasets: [
+                    {
+                        label: 'Logs Processed (thousands)',
+                        data: [125, 243, 567, 843, 672, 531, 125],
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Alerts Generated',
+                        data: [3, 7, 12, 22, 18, 15, 3],
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#e0e0ff'
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#a0a0cc'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#a0a0cc'
+                        }
+                    }
+                }
+            }
+        });
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        createChart();
+    });
+</script>

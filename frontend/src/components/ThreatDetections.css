@@ -1,0 +1,356 @@
+/* Styles for ThreatDetections component */
+:root {
+  --card-bg: #1a1a2e;
+  --border-color: #2a2a3a;
+  --text-primary: #e0e0ff;
+  --text-secondary: #a0a0cc;
+  --accent-green: #28a745;
+  --accent-red: #dc3545;
+  --accent-orange: #fd7e14;
+  --accent-blue: #007bff;
+  --accent-purple: #8a2be2;
+}
+
+.live-feed-section {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 25px;
+  border: 1px solid var(--border-color);
+}
+
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.feed-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.feed-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--accent-green);
+}
+
+.alert-count {
+  background-color: var(--accent-red);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.feed-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--accent-green);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.feed-content {
+  max-height: 400px;
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+/* Scrollbar styling for feed content */
+.feed-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.feed-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.feed-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.feed-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.alerts-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: transparent;
+}
+
+.alerts-table th,
+.alerts-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+}
+
+.alerts-table th {
+  background-color: rgba(255, 255, 255, 0.03);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.alerts-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.alert-row {
+  transition: background-color 0.2s ease;
+}
+
+.alert-row:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.alert-row.expanded {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.expand-toggle {
+  cursor: pointer;
+  width: 20px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.expand-toggle svg {
+  transition: transform 0.2s ease-in-out;
+}
+
+.expand-toggle svg.rotated {
+  transform: rotate(90deg);
+}
+
+.severity-badge {
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.severity-badge.critical {
+  background-color: var(--accent-red);
+}
+
+.severity-badge.warning {
+  background-color: var(--accent-orange);
+}
+
+.severity-badge.info {
+  background-color: var(--accent-blue);
+}
+
+.severity-badge.security {
+  background-color: var(--accent-purple);
+}
+
+.view-raw-btn {
+  background-color: var(--accent-blue);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s ease;
+  font-family: inherit;
+}
+
+.view-raw-btn:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.expandable-content {
+  display: none;
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.expandable-content.active {
+  display: table-row;
+}
+
+.expanded-details {
+  padding: 10px 15px 10px 40px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  border-top: 1px dashed rgba(255, 255, 255, 0.05);
+  line-height: 1.6;
+}
+
+.expanded-details strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: var(--card-bg);
+  margin: auto;
+  padding: 25px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: var(--text-primary);
+  font-size: 20px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.modal-content pre {
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border-radius: 8px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: #e0e0e0;
+  max-height: 400px;
+  margin: 0;
+}
+
+.close-button {
+  color: var(--text-secondary);
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  line-height: 1;
+  background: none;
+  border: none;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button:hover,
+.close-button:focus {
+  color: var(--text-primary);
+  outline: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .live-feed-section {
+    padding: 20px;
+  }
+  
+  .alerts-table th,
+  .alerts-table td {
+    padding: 10px;
+    font-size: 12px;
+  }
+  
+  .severity-badge {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+  
+  .view-raw-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+  
+  .modal-content {
+    padding: 20px;
+    margin: 20px;
+    width: calc(100% - 40px);
+  }
+}
+
+@media (max-width: 480px) {
+  .alerts-table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .feed-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .feed-status {
+    align-self: flex-end;
+  }
+}

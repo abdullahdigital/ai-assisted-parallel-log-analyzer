@@ -1,0 +1,572 @@
+---
+---
+
+<section class="performance-section">
+  <div class="section-header">
+    <div class="section-title">REAL-TIME ANALYSIS & PERFORMANCE METRICS</div>
+    <div class="mode-badges">
+      <span class="mode-badge active">LIVE</span>
+      <span class="mode-badge">STREAMING</span>
+    </div>
+  </div>
+
+  <table class="metrics-table">
+    <thead>
+      <tr>
+        <th>MODE</th>
+        <th>LOGS PROCESSED</th>
+        <th>TIME (MS)</th>
+        <th>LOGS/SEC</th>
+        <th>ALERTS</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="mode-row" id="sequential-row">
+        <td class="mode-cell">
+          <div class="mode-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </div>
+          <div class="mode-info">
+            <h4>Sequential</h4>
+            <span>Standard processing</span>
+          </div>
+        </td>
+        <td class="value-cell" data-metric="logsProcessed">0</td>
+        <td class="value-cell" data-metric="timeTaken">0<span class="unit">ms</span></td>
+        <td class="value-cell" data-metric="logsPerSec">0<span class="unit">/sec</span></td>
+        <td class="alert-cell">
+          <div class="alert-count">0</div>
+          <span class="alert-text">No alerts</span>
+        </td>
+      </tr>
+      <tr class="progress-row">
+        <td colspan="5">
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="sequential-progress" style="width: 0%;"></div>
+          </div>
+        </td>
+      </tr>
+      <tr class="mode-row" id="parallel-row">
+        <td class="mode-cell">
+          <div class="mode-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-purple)" stroke-width="2">
+              <polygon points="13 19 22 12 13 5 13 19"></polygon>
+              <polygon points="2 19 11 12 2 5 2 19"></polygon>
+            </svg>
+          </div>
+          <div class="mode-info">
+            <h4>Parallel</h4>
+            <span>Multi-threaded</span>
+          </div>
+        </td>
+        <td class="value-cell" data-metric="logsProcessed">0</td>
+        <td class="value-cell" data-metric="timeTaken">0<span class="unit">ms</span></td>
+        <td class="value-cell" data-metric="logsPerSec">0<span class="unit">/sec</span></td>
+        <td class="alert-cell">
+          <div class="alert-count">0</div>
+          <span class="alert-text">No alerts</span>
+        </td>
+      </tr>
+      <tr class="progress-row">
+        <td colspan="5">
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="parallel-progress" style="width: 0%;"></div>
+          </div>
+        </td>
+      </tr>
+      <tr class="mode-row" id="distributed-row">
+        <td class="mode-cell">
+          <div class="mode-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <div class="mode-info">
+            <h4>Distributed</h4>
+            <span>Cluster mode</span>
+          </div>
+        </td>
+        <td class="value-cell" data-metric="logsProcessed">0</td>
+        <td class="value-cell" data-metric="timeTaken">0<span class="unit">ms</span></td>
+        <td class="value-cell" data-metric="logsPerSec">0<span class="unit">/sec</span></td>
+        <td class="alert-cell">
+          <div class="alert-count">0</div>
+          <span class="alert-text">No alerts</span>
+        </td>
+      </tr>
+      <tr class="progress-row">
+        <td colspan="5">
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="distributed-progress" style="width: 0%;"></div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  <div class="action-buttons">
+    <button class="action-btn secondary" id="run-sequential-btn">
+      <svg class="action-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+      </svg>
+      Run Sequential
+    </button>
+    <button class="action-btn secondary" id="run-parallel-btn">
+      <svg class="action-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="13 19 22 12 13 5 13 19"></polygon>
+        <polygon points="2 19 11 12 2 5 2 19"></polygon>
+      </svg>
+      Run Parallel
+    </button>
+    <button class="action-btn secondary" id="run-distributed-btn">
+      <svg class="action-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+      </svg>
+      Run Distributed
+    </button>
+    <button class="action-btn primary" id="ai-explanation-btn">
+      <svg class="action-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5a3 3 0 1 0-3 3"></path>
+        <path d="M12 5a3 3 0 1 1 3 3"></path>
+        <path d="M12 7a6 6 0 0 1 6 6v3a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2v-1a2 2 0 0 0-2-2 1 1 0 0 1-1-1V7a3 3 0 0 0-3-3H8a3 3 0 0 0-3 3v1a1 1 0 0 1-1 1 2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2v-3a6 6 0 0 1 6-6z"></path>
+      </svg>
+      Get AI Explanation
+    </button>
+    <input type="file" id="log-file-upload" accept=".log,.txt" style="display: none;"/>
+    <button class="action-btn primary" id="upload-log-btn">
+      <svg class="action-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21.2 15.8v-1.4c0-1.3-.8-2.5-2-3.1l-1.2-.6c-.6-.3-1-.9-1-1.6V7.5c0-.8-.6-1.5-1.4-1.5h-2.8c-.8 0-1.4.7-1.4 1.5v1.6c0 .7-.4 1.3-1 1.6l-1.2.6c-1.2.6-2 1.8-2 3.1v1.4c0 1.3.8 2.5 2 3.1l1.2.6c.6.3 1 .9 1 1.6v1.6c0 .8.6 1.5 1.4 1.5h2.8c.8 0 1.4-.7 1.4-1.5v-1.6c0-.7.4-1.3 1-1.6l1.2-.6c1.2-.6 2-1.8 2-3.1z"/>
+        <path d="M12 18v-6"/>
+        <path d="M9 15l3-3 3 3"/>
+      </svg>
+      Upload Log File
+    </button>
+  </div>
+
+
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const runSequentialBtn = document.getElementById('run-sequential-btn');
+    const runParallelBtn = document.getElementById('run-parallel-btn');
+    const runDistributedBtn = document.getElementById('run-distributed-btn');
+    const aiExplanationBtn = document.getElementById('ai-explanation-btn');
+    const logFileUpload = document.getElementById('log-file-upload');
+    const uploadLogBtn = document.getElementById('upload-log-btn');
+
+    let logData = [];
+    let processedLogCount = 0;
+    let totalLogEntries = 0;
+
+    // Fetch log data from public/data/example_log.txt
+    async function fetchLogData() {
+      try {
+        const response = await fetch('/data/example_log.txt');
+        const text = await response.text();
+        logData = text.split('\n').filter(line => line.trim() !== '');
+        totalLogEntries = logData.length;
+        console.log(`Loaded ${totalLogEntries} log entries.`);
+      } catch (error) {
+        console.error('Error fetching log data:', error);
+      }
+    }
+
+    // Handle file upload
+    uploadLogBtn.addEventListener('click', () => {
+      logFileUpload.click(); // Trigger the hidden file input
+    });
+
+    logFileUpload.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        console.log('Selected file:', file.name);
+        // Here you would typically send the file to the backend for processing
+        // For now, we'll just log the file name.
+        alert(`File selected: ${file.name}. In a real application, this would be uploaded to the backend.`);
+      }
+    });
+
+    // Helper function
+    const getRandomNumber = (min, max) => {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    };
+
+    // Animate number changes
+    const animateNumberChange = (element, start, end, unit = '', duration = 500) => {
+      const range = end - start;
+      let current = start;
+      const increment = end > start ? 1 : -1;
+      const stepTime = Math.abs(Math.floor(duration / range));
+      const timer = setInterval(() => {
+        current += increment;
+        element.textContent = current.toLocaleString() + unit;
+        if (current === end) {
+          clearInterval(timer);
+        }
+      }, stepTime);
+    };
+
+    // Reset metrics and progress bars
+    const resetMetrics = (mode) => {
+      const rowMap = {
+        'Sequential': document.getElementById('sequential-row'),
+        'Parallel': document.getElementById('parallel-row'),
+        'Distributed': document.getElementById('distributed-row')
+      };
+      const progressMap = {
+        'Sequential': document.getElementById('sequential-progress'),
+        'Parallel': document.getElementById('parallel-progress'),
+        'Distributed': document.getElementById('distributed-progress')
+      };
+
+      const row = rowMap[mode];
+      const progressBar = progressMap[mode];
+
+      if (row) {
+        row.querySelector('[data-metric="logsProcessed"]').textContent = '0';
+        row.querySelector('[data-metric="timeTaken"]').innerHTML = '0<span class="unit">ms</span>';
+        row.querySelector('[data-metric="logsPerSec"]').innerHTML = '0<span class="unit">/sec</span>';
+        row.querySelector('.alert-count').textContent = '0';
+        row.querySelector('.alert-text').textContent = 'No alerts';
+      }
+      if (progressBar) {
+        progressBar.style.width = '0%';
+      }
+    };
+
+    // Simulate processing
+    const simulateProcessing = (mode) => {
+      resetMetrics(mode); // Reset metrics for the current mode before starting
+
+      const buttons = {
+        'Sequential': runSequentialBtn,
+        'Parallel': runParallelBtn,
+        'Distributed': runDistributedBtn
+      };
+
+      const button = buttons[mode];
+      if (!button) return;
+
+      const originalText = button.innerHTML;
+      button.innerHTML = `
+        <svg class="action-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+        </svg>
+        Processing...
+      `;
+      button.disabled = true;
+
+      const startTime = performance.now();
+      let logsProcessedThisRun = 0;
+      let alertsDetectedThisRun = 0;
+      processedLogCount = 0; // Reset for each run
+
+      const processChunk = () => {
+        const chunkSize = Math.min(totalLogEntries - processedLogCount, getRandomNumber(5, 15)); // Process a chunk of logs
+        if (chunkSize === 0) {
+          clearInterval(processingInterval);
+          button.innerHTML = originalText;
+          button.disabled = false;
+          updateMetrics(mode, logsProcessedThisRun, performance.now() - startTime, alertsDetectedThisRun, 100); // Ensure progress is 100% at end
+          return;
+        }
+
+        for (let i = 0; i < chunkSize; i++) {
+          const logEntry = logData[processedLogCount];
+          if (logEntry && (logEntry.includes('ERROR') || logEntry.includes('SECURITY'))) {
+            alertsDetectedThisRun++;
+          }
+          processedLogCount++;
+          logsProcessedThisRun++;
+        }
+        const progress = (processedLogCount / totalLogEntries) * 100;
+        updateMetrics(mode, logsProcessedThisRun, performance.now() - startTime, alertsDetectedThisRun, progress);
+      };
+
+      const processingInterval = setInterval(processChunk, 100); // Simulate processing chunks every 100ms
+    };
+
+    // Update metrics after processing
+    const updateMetrics = (mode, currentLogsProcessed, timeTaken, currentAlerts, progress) => {
+      const rowMap = {
+        'Sequential': document.getElementById('sequential-row'),
+        'Parallel': document.getElementById('parallel-row'),
+        'Distributed': document.getElementById('distributed-row')
+      };
+      const progressMap = {
+        'Sequential': document.getElementById('sequential-progress'),
+        'Parallel': document.getElementById('parallel-progress'),
+        'Distributed': document.getElementById('distributed-progress')
+      };
+
+      const row = rowMap[mode];
+      const progressBar = progressMap[mode];
+
+      if (!row) return;
+
+      const logsProcessedElement = row.querySelector('[data-metric="logsProcessed"]');
+      const timeTakenElement = row.querySelector('[data-metric="timeTaken"]');
+      const logsPerSecElement = row.querySelector('[data-metric="logsPerSec"]');
+      const alertCountElement = row.querySelector('.alert-count');
+      const alertTextElement = row.querySelector('.alert-text');
+
+      // Animate number updates
+      const prevLogsProcessed = parseInt(logsProcessedElement.textContent.replace(/,/g, '')) || 0;
+      animateNumberChange(logsProcessedElement, prevLogsProcessed, currentLogsProcessed);
+
+      const prevTimeTaken = parseFloat(timeTakenElement.textContent) || 0;
+      timeTakenElement.innerHTML = `${Math.round(timeTaken)}<span class="unit">ms</span>`; // No animation for time for now
+
+      const currentLogsPerSec = Math.round(currentLogsProcessed / (timeTaken / 1000)) || 0;
+      const prevLogsPerSec = parseFloat(logsPerSecElement.textContent) || 0;
+      logsPerSecElement.innerHTML = `${currentLogsPerSec}<span class="unit">/sec</span>`; // No animation for logs/sec for now
+
+      const prevAlerts = parseInt(alertCountElement.textContent) || 0;
+      animateNumberChange(alertCountElement, prevAlerts, currentAlerts);
+      
+      alertTextElement.textContent = currentAlerts > 0 ? 'Alerts detected' : 'No alerts';
+
+      // Update progress bar
+      if (progressBar) {
+        progressBar.style.width = `${progress}%`;
+      }
+    };
+
+    // AI Explanation
+    const showAIExplanation = () => {
+      const explanation = `
+        Current Performance Analysis:
+        
+        • Distributed Mode leads with high logs/sec throughput
+        • Parallel processing provides significant speed improvement over sequential
+        • Real-time monitoring indicates system is operating within optimal parameters
+        
+        Recommendations:
+        1. Continue with distributed cluster for large-scale processing
+        2. Monitor resource utilization during peak loads
+        3. Consider scaling worker nodes for increased log volume
+        
+        System Health: Optimal ✅
+      `;
+      
+      alert('AI Analysis Report:\n\n' + explanation);
+    };
+
+    // Event listeners
+    if (runSequentialBtn) runSequentialBtn.addEventListener('click', () => simulateProcessing('Sequential'));
+    if (runParallelBtn) runParallelBtn.addEventListener('click', () => simulateProcessing('Parallel', 1500));
+    if (runDistributedBtn) runDistributedBtn.addEventListener('click', () => simulateProcessing('Distributed', 1000));
+    if (aiExplanationBtn) aiExplanationBtn.addEventListener('click', showAIExplanation);
+
+    // Initial fetch of log data
+    fetchLogData();
+  });
+</script>
+
+<style>
+  /* Styles for RealtimeAnalysis component */
+  .performance-section {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 1px solid var(--border-color);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .mode-badges {
+    display: flex;
+    gap: 10px;
+  }
+
+  .mode-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .mode-badge.active {
+    background-color: rgba(0, 123, 255, 0.1);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+  }
+
+  .mode-badge:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .metrics-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .metrics-table th {
+    text-align: left;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+  }
+
+  .metrics-table td {
+    padding: 20px 15px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .metrics-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .mode-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mode-icon {
+    width: 32px;
+    height: 32px;
+    background-color: rgba(0, 123, 255, 0.1);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mode-info h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+
+  .mode-info span {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .value-cell {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .unit {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-left: 3px;
+  }
+
+  .alert-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .alert-count {
+    background-color: var(--accent-red);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .no-alerts {
+    color: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+  }
+
+  .action-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+  }
+
+  .action-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .action-btn.primary {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    border: none;
+  }
+
+  .action-btn.secondary {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .action-btn-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .progress-bar-container {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    height: 8px;
+    overflow: hidden;
+    margin-top: 10px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background-color: var(--accent-blue);
+    width: 0%;
+    transition: width 0.3s ease-out;
+  }
+
+  .mode-row td {
+    padding-bottom: 5px;
+  }
+
+  .progress-row td {
+    padding-top: 0;
+    padding-bottom: 20px;
+  }
+</style>

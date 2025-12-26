@@ -1,0 +1,267 @@
+---
+---
+
+<section class="rule-management-section">
+  <div class="section-header">
+    <div class="section-title">DETECTION RULES</div>
+    <div class="header-controls">
+      <button class="action-btn secondary" id="load-rules-btn">
+        <svg class="action-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Load Rules
+      </button>
+      <button class="action-btn primary" id="save-rules-btn">
+        <svg class="action-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
+        Save Rules
+      </button>
+    </div>
+  </div>
+
+  <div class="rule-editor">
+    <div id="rule-editor-content" contenteditable="true" spellcheck="false" class="syntax-highlighted-editor" placeholder="Edit your detection rules here (JSON format)"></div>
+  </div>
+
+  <script is:inline>
+    const editor = document.getElementById('rule-editor-content');
+
+    const highlightJson = (jsonString) => {
+      if (!jsonString) return '';
+
+      // Basic JSON syntax highlighting regex
+      jsonString = jsonString.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      
+      // Keys
+      jsonString = jsonString.replace(/"(\w+)"\s*:/g, '<span class="json-key">"$1"</span>:');
+      // Strings
+      jsonString = jsonString.replace(/"([^"]*)"/g, '<span class="json-string">"$1"</span>');
+      // Numbers
+      jsonString = jsonString.replace(/\b(\d+(\.\d+)?)\b/g, '<span class="json-number">$1</span>');
+      // Booleans and null
+      jsonString = jsonString.replace(/\b(true|false|null)\b/g, '<span class="json-boolean">$1</span>');
+
+      return jsonString;
+    };
+
+    const applyHighlighting = () => {
+      const text = editor.textContent;
+      editor.innerHTML = highlightJson(text);
+      // Restore cursor position (this is a simplified approach and might not be perfect)
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.selectNodeContents(editor);
+      range.collapse(false); // Collapse to the end
+      sel.removeAllRanges();
+      sel.addRange(range);
+    };
+
+    editor.addEventListener('input', applyHighlighting);
+
+    // Initial highlighting if there's any content
+    applyHighlighting();
+  </script>
+
+  <div class="rule-list">
+    <h3>Active Rules</h3>
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>NAME</th>
+          <th>TYPE</th>
+          <th>STATUS</th>
+          <th>ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Brute Force Login</td>
+          <td>IP-based</td>
+          <td><span class="status-active">Active</span></td>
+          <td>
+            <button class="action-btn small secondary">Edit</button>
+            <button class="action-btn small secondary">Disable</button>
+          </td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>High Freq Request</td>
+          <td>Threshold</td>
+          <td><span class="status-active">Active</span></td>
+          <td>
+            <button class="action-btn small secondary">Edit</button>
+            <button class="action-btn small secondary">Disable</button>
+          </td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Suspicious IP</td>
+          <td>Behavioral</td>
+          <td><span class="status-inactive">Inactive</span></td>
+          <td>
+            <button class="action-btn small secondary">Edit</button>
+            <button class="action-btn small secondary">Enable</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<style>
+  /* Styles for DetectionRules component */
+  .rule-management-section {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 1px solid var(--border-color);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .header-controls {
+    display: flex;
+    gap: 15px;
+  }
+
+  .action-btn {
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+  }
+
+  .action-btn.primary {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    border: none;
+    color: white;
+  }
+
+  .action-btn.secondary {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .action-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .action-btn-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .rule-editor .syntax-highlighted-editor {
+    width: 100%;
+    min-height: 150px; /* Reduced height as per user request */
+    background-color: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: var(--text-primary);
+    resize: vertical;
+    margin-bottom: 20px;
+    white-space: pre-wrap; /* Preserve whitespace and wrap text */
+    word-wrap: break-word; /* Break long words */
+    outline: none; /* Remove outline on focus */
+  }
+
+  /* Placeholder styling for contenteditable div */
+  .rule-editor .syntax-highlighted-editor:empty:before {
+    content: attr(placeholder);
+    color: var(--text-secondary);
+    pointer-events: none;
+  }
+
+  /* Syntax highlighting styles */
+  .json-key {
+    color: var(--accent-blue); /* Example color for keys */
+  }
+
+  .json-string {
+    color: var(--accent-green); /* Example color for strings */
+  }
+
+  .json-number {
+    color: var(--accent-purple); /* Example color for numbers */
+  }
+
+  .json-boolean {
+    color: var(--accent-orange); /* Example color for booleans (true/false/null) */
+  }
+
+  .rule-list h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+
+  .metrics-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .metrics-table th,
+  .metrics-table td {
+    text-align: left;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .metrics-table th {
+    background-color: rgba(255, 255, 255, 0.03);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+  }
+
+  .metrics-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .status-active {
+    color: var(--accent-green);
+    font-weight: 500;
+  }
+
+  .status-inactive {
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .action-btn.small {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 5px;
+  }
+</style>
