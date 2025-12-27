@@ -1,0 +1,21 @@
+[
+  {
+    "name": "AlternativesLog",
+    "pattern": "^(?P<event_type>[^ ]+) (?P<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}): (?P<message>.*)$",
+    "field_map": {
+      "event_type": "event_type",
+      "timestamp": "timestamp",
+      "message": "message"
+    },
+    "default": false
+  },
+  {
+    "name": "DefaultLog",
+    "pattern": "^(?P<message>.*)$",
+    "field_map": {
+      "event_type": "unknown_event",
+      "message": "message"
+    },
+    "default": true
+  }
+]

@@ -6,12 +6,12 @@ use chrono::{Utc};
 
 const WORKER_PORT: u16 = 8081;
 
-pub async fn run_master(log_lines: Vec<String>, rules: Vec<Rule>, num_workers: usize) -> Result<Metrics, Box<dyn std::error::Error>> {
+pub async fn run_master(log_lines: Vec<String>, rules: Vec<Rule>, num_workers: usize) -> Result<Metrics, Box<dyn std::error::Error + Send + Sync>> {
     let start_time = Instant::now();
     let listener = TcpListener::bind(format!("127.0.0.1:{}", WORKER_PORT)).await?;
     println!("Master listening on port {}", WORKER_PORT);
 
-    let mut worker_handles = Vec::new();
+    let mut worker_handles: Vec<tokio::task::JoinHandle<Result<tokio::net::TcpStream, Box<dyn std::error::Error + Send + Sync>>>> = Vec::new();
     let mut worker_streams = Vec::new();
 
     for i in 0..num_workers {
@@ -73,13 +73,15 @@ pub async fn run_master(log_lines: Vec<String>, rules: Vec<Rule>, num_workers: u
 
     let mut worker_streams_for_shutdown = Vec::new();
     for handle in handles {
-        worker_streams_for_shutdown.push(handle.await?.map_err(|e| Box::<dyn std::error::Error + Send + Sync>::from(e))?);
+        let stream_result = handle.await?;
+        let stream = stream_result?;
+        worker_streams_for_shutdown.push(stream);
     }
 
     // Now send shutdown messages and collect final results
     let mut final_handles = Vec::new();
     for mut stream in worker_streams_for_shutdown {
-        let handle = tokio::spawn(async move {
+        let handle: tokio::task::JoinHandle<Result<MasterMessage, Box<dyn std::error::Error + Send + Sync>>> = tokio::spawn(async move {
             let shutdown_message = WorkerMessage::Shutdown;
             let serialized_shutdown = serde_json::to_vec(&shutdown_message)?;
             stream.write_all(&(serialized_shutdown.len() as u32).to_le_bytes()).await?;

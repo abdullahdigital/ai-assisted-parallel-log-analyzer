@@ -3,12 +3,19 @@ use chrono::{DateTime, Utc};
 
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+use std::collections::HashMap;
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct LogEntry {
-    pub timestamp: DateTime<Utc>,
+    pub raw_log: String,
+    pub timestamp: Option<DateTime<Utc>>,
+    pub event_type: Option<String>,
     pub ip_address: Option<String>,
     pub user_id: Option<String>,
-    pub event_type: String,
-    pub details: String,
+    pub level: Option<String>,
+    pub message: Option<String>,
+    #[serde(flatten)]
+    pub extra: HashMap<String, String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -56,6 +63,14 @@ pub struct Rule {
     pub rule_type: RuleType,
     pub time_window_seconds: Option<u64>,
     pub threshold: Option<usize>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ParsingRule {
+    pub name: String,
+    pub pattern: String, // Regex pattern
+    pub field_map: HashMap<String, String>, // Maps regex capture group names to LogEntry fields
+    pub default: bool, // If true, this rule is applied if no other rule matches
 }
 
 #[derive(Debug, Serialize, Deserialize)]

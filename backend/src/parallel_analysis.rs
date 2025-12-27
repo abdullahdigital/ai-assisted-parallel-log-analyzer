@@ -21,11 +21,14 @@ pub fn run_parallel_analysis(parsed_logs: Vec<LogEntry>, rules: Vec<Rule>) -> Me
         }
     });
 
+    let final_processed_logs_count = *processed_logs_count.lock().unwrap();
+    let final_alerts = alerts.lock().unwrap().clone();
+
     Metrics {
-        total_logs_processed: *processed_logs_count.lock().unwrap(),
+        total_logs_processed: final_processed_logs_count,
         execution_time_ms: 0,
         logs_per_second: 0.0,
-        alerts_generated: alerts.lock().unwrap().clone(),
+        alerts_generated: final_alerts,
         mode: "Parallel".to_string(),
     }
 }

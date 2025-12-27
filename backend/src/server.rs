@@ -1,15 +1,17 @@
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 use actix_web::web::Bytes;
+use actix_cors::Cors;
 
 use std::sync::{Arc, Mutex};
 
-use crate::models::{LogEntry, Rule};
+use crate::models::{LogEntry, Rule, ParsingRule};
 use crate::rules_engine::RulesEngine;
 use crate::log_processor::{process_sequential, process_parallel, process_distributed, parse_log_content};
 use crate::ai_module::{explain_log_entry, generate_rule_from_description};
 
 pub struct AppState {
     pub rules_engine: Arc<Mutex<RulesEngine>>,
+    pub parsing_rules: Arc<Mutex<Vec<ParsingRule>>>,
 }
 
 #[post("/api/logs/upload")]
@@ -19,7 +21,7 @@ pub async fn upload_log_endpoint(log_content: Bytes, data: web::Data<AppState>) 
         Err(e) => return HttpResponse::BadRequest().body(format!("Invalid UTF-8 sequence: {}", e)),
     };
 
-    let log_entries = parse_log_content(log_string);
+    let log_entries = parse_log_content(log_string, Arc::clone(&data.parsing_rules));
     let rules_engine_arc = Arc::clone(&data.rules_engine);
     let alerts = process_sequential(log_entries, rules_engine_arc);
     HttpResponse::Ok().json(alerts)
@@ -83,9 +85,9 @@ pub async fn generate_rule_endpoint(description: web::Json<String>) -> impl Resp
     }
 }
 
-pub async fn run_server(rules_engine: Arc<Mutex<RulesEngine>>) -> std::io::Result<()> {
+pub async fn run_server(rules_engine: Arc<Mutex<RulesEngine>>, parsing_rules: Vec<ParsingRule>) -> std::io::Result<()> {
     // Load rules from rules.json at startup
-    let rules_path = "backend/rules.json";
+    let rules_path = "rules.json";
     let rules_content = std::fs::read_to_string(rules_path)
         .expect(&format!("Failed to read rules file: {}", rules_path));
     {
@@ -94,9 +96,22 @@ pub async fn run_server(rules_engine: Arc<Mutex<RulesEngine>>) -> std::io::Resul
             .expect("Failed to load rules from JSON");
     }
 
+    let parsing_rules_arc = Arc::new(Mutex::new(parsing_rules));
+
     HttpServer::new(move || {
+        let cors = Cors::default()
+            .allowed_origin("http://localhost:4321")
+            .allowed_methods(vec!["GET", "POST"])
+            .allowed_headers(vec![actix_web::http::header::AUTHORIZATION, actix_web::http::header::ACCEPT])
+            .allowed_header(actix_web::http::header::CONTENT_TYPE)
+            .max_age(3600);
+
         App::new()
-            .app_data(web::Data::new(AppState { rules_engine: Arc::clone(&rules_engine) }))
+            .wrap(cors)
+            .app_data(web::Data::new(AppState { 
+                rules_engine: Arc::clone(&rules_engine),
+                parsing_rules: Arc::clone(&parsing_rules_arc),
+            }))
             .service(load_rules_endpoint)
             .service(get_rules_endpoint)
             .service(add_rule_endpoint)
